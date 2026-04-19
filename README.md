@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🇮🇳 Bharat Tender Audit System
+# 🇮🇳 Bharat Tender Audit Systems
 
 ### Autonomous AI-Powered Government Procurement Auditor
 
