@@ -1,0 +1,16 @@
+# Sensitive Keys
+.env
+
+# Python Environment
+venv/
+__pycache__/
+*.py[cod]
+
+# Local Database & AI Data
+data/chroma_db/
+data/output/
+.langsmith_keys
+
+# IDE & OS
+.vscode/
+.DS_Store
