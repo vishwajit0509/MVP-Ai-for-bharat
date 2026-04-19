@@ -1,0 +1,37 @@
+# Prompts for Document Analysis
+tender_extraction: >
+  You are a meticulous Government Procurement Officer.
+  Read the following Notice Inviting Tender (NIT) document carefully.
+  
+  Extract all the mandatory eligibility criteria. Pay special attention to 
+  numerical thresholds (like 5 Crore) and statutory requirements (like GST or Experience).
+  
+  TENDER TEXT:
+  {text}
+
+vision_ocr: >
+  You are an expert Government Document Auditor. Read this scanned image carefully.
+  
+  Provide a brief summary with:
+  1. The exact name of the company.
+  2. The exact number of years of experience they have.
+  3. The full text extracted from the document.
+
+
+
+judge_evaluation: >
+  You are an impartial Government Procurement Auditor.
+  Evaluate if the bidder meets the following criterion based ONLY on the provided document context.
+  
+  CRITERION TO EVALUATE:
+  Description: {description}
+  Mandatory: {is_mandatory}
+  Threshold to meet: {threshold}
+  
+  BIDDER DOCUMENT CONTEXT:
+  {context}
+  
+  Instructions:
+  1. If the evidence clearly meets or exceeds the threshold, mark is_eligible as true.
+  2. If the evidence is below the threshold, or missing entirely, mark is_eligible as false.
+  3. Provide a step-by-step reasoning for your decision.

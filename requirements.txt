@@ -1,0 +1,14 @@
+langchain
+langchain-google-genai
+langgraph
+langsmith
+chromadb
+pydantic
+pypdf
+pdf2image
+rich
+python-dotenv
+google-generativeai
+langchain-community
+langchain-chroma
+langchain-core
