@@ -171,6 +171,16 @@ The system will process every bidder folder and output a structured verdict for 
 
 ---
 
+## results 
+
+![alt text](image-2.png)
+![alt text](image-3.png)
+![alt text](image-4.png)
+![alt text](image-5.png)
+![alt text](image-6.png)
+![alt text](image-7.png)
+![alt text](image-8.png)
+
 ## Roadmap
 
 The MVP core is complete. The following nodes are planned for v2:
