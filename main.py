@@ -6,12 +6,12 @@ import json
 from typing import Literal
 
 from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTextResponse, StreamingResponse
-from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
 
-from app.config import STATIC_DIR, TEMPLATES_DIR
+from app.config import TEMPLATES_DIR
 from app.db import init_db
 from app.repository import (
     build_report_csv_rows,
@@ -33,8 +33,13 @@ app = FastAPI(
     description="Audit-first tender evaluation workspace for CRPF procurement teams.",
     version="2.0.0",
 )
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5174", "http://127.0.0.1:5174"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
-app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 
 class CriterionUpdate(BaseModel):
@@ -57,10 +62,6 @@ def startup() -> None:
     init_db()
     seed_demo_data()
 
-
-@app.get("/", response_class=HTMLResponse)
-def index(request: Request) -> HTMLResponse:
-    return templates.TemplateResponse(request=request, name="index.html", context={})
 
 
 @app.get("/reports/{tender_id}", response_class=HTMLResponse)

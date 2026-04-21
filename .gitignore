@@ -16,3 +16,4 @@ data/platform/
 # IDE & OS
 .vscode/
 .DS_Store
+node_modules/
