@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CRPF Tender Intelligence Console</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+
+      <!-- ── TOPBAR ──────────────────────────────── -->
+      <header class="topbar">
+        <div class="topbar-inner">
+          <div class="brand-block">
+            <div class="brand-icon">🛡</div>
+            <div class="brand-text">
+              <div class="brand-kicker">Government Procurement Intelligence</div>
+              <h1>CRPF Tender Console</h1>
+            </div>
+          </div>
+          <div class="topbar-actions">
+            <label class="selector-wrap">
+              <span>Active workspace</span>
+              <select id="tender-selector" aria-label="Select tender workspace"></select>
+            </label>
+            <button class="icon-button" data-action="open-tender-dialog" title="Create tender workspace">
+              <span class="button-icon">+</span>
+              <span>New Tender</span>
+            </button>
+            <button class="icon-button accent" data-action="open-bidder-dialog" title="Add bidder submission">
+              <span class="button-icon">+</span>
+              <span>Add Bidder</span>
+            </button>
+            <button class="icon-button ghost" data-action="run-evaluation" title="Re-run full evaluation">
+              <span class="button-icon">↻</span>
+              <span>Evaluate</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- ── STATUS TOAST ──────────────────────── -->
+      <div id="status-banner" class="status-banner hidden" role="status" aria-live="polite"></div>
+
+      <!-- ── SECTION NAV ───────────────────────── -->
+      <nav class="topbar nav-band" aria-label="Jump to section">
+        <div class="inner section-nav">
+          <button class="nav-chip" data-scroll-target="criteria-section">
+            <span class="chip-num">01</span> Criteria
+          </button>
+          <button class="nav-chip" data-scroll-target="matrix-section">
+            <span class="chip-num">02</span> Matrix
+          </button>
+          <button class="nav-chip" data-scroll-target="bidders-section">
+            <span class="chip-num">03</span> Bidders
+          </button>
+          <button class="nav-chip" data-scroll-target="review-section">
+            <span class="chip-num">04</span> Review Queue
+          </button>
+          <button class="nav-chip" data-scroll-target="audit-section">
+            <span class="chip-num">05</span> Audit Trail
+          </button>
+        </div>
+      </nav>
+
+      <main>
+        <!-- ── HERO + METRICS ────────────────── -->
+        <section class="band intro-band">
+          <div class="inner intro-grid">
+            <div id="hero-panel"></div>
+            <div id="metric-panel"></div>
+          </div>
+        </section>
+
+        <!-- ── CRITERIA ──────────────────────── -->
+        <section class="band" id="criteria-section">
+          <div class="inner">
+            <div class="section-heading">
+              <div>
+                <div class="eyebrow">01 · Tender Understanding</div>
+                <h2>Eligibility Criteria</h2>
+              </div>
+            </div>
+            <div id="criteria-grid" class="criteria-grid"></div>
+          </div>
+        </section>
+
+        <!-- ── MATRIX ────────────────────────── -->
+        <section class="band alt" id="matrix-section">
+          <div class="inner">
+            <div class="section-heading">
+              <div>
+                <div class="eyebrow">02 · Criterion-Level Verdicts</div>
+                <h2>Evaluation Matrix</h2>
+              </div>
+            </div>
+            <div id="matrix-wrapper"></div>
+          </div>
+        </section>
+
+        <!-- ── BIDDERS ────────────────────────── -->
+        <section class="band" id="bidders-section">
+          <div class="inner">
+            <div class="section-heading">
+              <div>
+                <div class="eyebrow">03 · Evidence Pack</div>
+                <h2>Bidder Dossiers</h2>
+              </div>
+            </div>
+            <div id="bidders-list" class="bidders-list"></div>
+          </div>
+        </section>
+
+        <!-- ── REVIEW QUEUE ───────────────────── -->
+        <section class="band alt" id="review-section">
+          <div class="inner">
+            <div class="section-heading">
+              <div>
+                <div class="eyebrow">04 · Human-in-the-Loop</div>
+                <h2>Manual Review Queue</h2>
+              </div>
+            </div>
+            <div id="review-list" class="review-list"></div>
+          </div>
+        </section>
+
+        <!-- ── AUDIT TRAIL ───────────────────── -->
+        <section class="band" id="audit-section">
+          <div class="inner">
+            <div class="section-heading">
+              <div>
+                <div class="eyebrow">05 · Auditability</div>
+                <h2>Decision Trail</h2>
+              </div>
+            </div>
+            <div id="audit-list" class="audit-list"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- ── NEW TENDER DIALOG ──────────────────── -->
+    <dialog id="tender-dialog" class="app-dialog">
+      <form id="tender-form" method="dialog" class="dialog-form">
+        <div class="dialog-head">
+          <h3>Create Tender Workspace</h3>
+          <button type="button" class="close-button" data-action="close-dialog" data-dialog="tender-dialog" title="Close">×</button>
+        </div>
+        <label>
+          <span>Tender title</span>
+          <input type="text" name="title" placeholder="e.g., Supply of Bulletproof Vests — Batch 2025" required />
+        </label>
+        <div class="form-grid two">
+          <label>
+            <span>Procuring Authority</span>
+            <input type="text" name="authority" value="Central Reserve Police Force" required />
+          </label>
+          <label>
+            <span>Reference number</span>
+            <input type="text" name="reference_no" placeholder="CRPF/HQ/2025/…" />
+          </label>
+        </div>
+        <label>
+          <span>Summary</span>
+          <textarea name="summary" rows="3" placeholder="Brief description of procurement scope…"></textarea>
+        </label>
+        <label>
+          <span>Tender documents</span>
+          <input type="file" name="files" accept=".pdf,.docx,.txt,.md,.png,.jpg,.jpeg" multiple required />
+        </label>
+        <div class="dialog-actions">
+          <button type="button" class="icon-button ghost" data-action="close-dialog" data-dialog="tender-dialog">
+            Cancel
+          </button>
+          <button type="submit" class="icon-button accent">
+            <span class="button-icon">+</span>
+            <span>Create Workspace</span>
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <!-- ── ADD BIDDER DIALOG ──────────────────── -->
+    <dialog id="bidder-dialog" class="app-dialog">
+      <form id="bidder-form" method="dialog" class="dialog-form">
+        <div class="dialog-head">
+          <h3>Add Bidder Submission</h3>
+          <button type="button" class="close-button" data-action="close-dialog" data-dialog="bidder-dialog" title="Close">×</button>
+        </div>
+        <input type="hidden" name="tender_id" />
+        <label>
+          <span>Company / Bidder name</span>
+          <input type="text" name="name" placeholder="e.g., Apex Defense Systems Pvt. Ltd." required />
+        </label>
+        <div class="form-grid three">
+          <label>
+            <span>Organisation type</span>
+            <input type="text" name="organization_type" placeholder="PSU / Private / JV" />
+          </label>
+          <label>
+            <span>City</span>
+            <input type="text" name="city" placeholder="New Delhi" />
+          </label>
+          <label>
+            <span>State</span>
+            <input type="text" name="state" placeholder="Delhi" />
+          </label>
+        </div>
+        <label>
+          <span>Submission documents</span>
+          <input type="file" name="files" accept=".pdf,.docx,.txt,.md,.png,.jpg,.jpeg" multiple required />
+        </label>
+        <div class="dialog-actions">
+          <button type="button" class="icon-button ghost" data-action="close-dialog" data-dialog="bidder-dialog">
+            Cancel
+          </button>
+          <button type="submit" class="icon-button accent">
+            <span class="button-icon">+</span>
+            <span>Add &amp; Evaluate</span>
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <!-- ── EDIT CRITERION DIALOG ──────────────── -->
+    <dialog id="criterion-dialog" class="app-dialog">
+      <form id="criterion-form" method="dialog" class="dialog-form">
+        <div class="dialog-head">
+          <h3>Edit Criterion</h3>
+          <button type="button" class="close-button" data-action="close-dialog" data-dialog="criterion-dialog" title="Close">×</button>
+        </div>
+        <input type="hidden" name="tender_id" />
+        <input type="hidden" name="criterion_id" />
+        <div class="form-grid two">
+          <label>
+            <span>Category</span>
+            <select name="category" required>
+              <option value="Financial">Financial</option>
+              <option value="Technical">Technical</option>
+              <option value="Compliance">Compliance</option>
+            </select>
+          </label>
+          <label class="checkbox-line">
+            <input type="checkbox" name="is_mandatory" checked />
+            <span>Mandatory criterion</span>
+          </label>
+        </div>
+        <label>
+          <span>Title</span>
+          <input type="text" name="title" required />
+        </label>
+        <label>
+          <span>Description</span>
+          <textarea name="description" rows="4" required></textarea>
+        </label>
+        <div class="form-grid two">
+          <label>
+            <span>Threshold text</span>
+            <input type="text" name="threshold_text" placeholder="e.g., Minimum ₹5 Cr turnover" />
+          </label>
+          <label>
+            <span>Threshold value</span>
+            <input type="number" name="threshold_value" step="0.01" placeholder="5000000" />
+          </label>
+        </div>
+        <label>
+          <span>Unit</span>
+          <input type="text" name="unit" placeholder="INR / years / units" />
+        </label>
+        <div class="dialog-actions">
+          <button type="button" class="icon-button ghost" data-action="close-dialog" data-dialog="criterion-dialog">
+            Cancel
+          </button>
+          <button type="submit" class="icon-button accent">
+            <span class="button-icon">✓</span>
+            <span>Save &amp; Re-evaluate</span>
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="/static/app.js" defer></script>
+  </body>
+</html>

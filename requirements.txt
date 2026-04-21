@@ -1,3 +1,7 @@
+fastapi
+uvicorn
+jinja2
+python-multipart
 langchain
 langchain-google-genai
 langgraph

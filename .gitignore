@@ -3,12 +3,14 @@
 
 # Python Environment
 venv/
+.venv/
 __pycache__/
 *.py[cod]
 
 # Local Database & AI Data
 data/chroma_db/
 data/output/
+data/platform/
 .langsmith_keys
 
 # IDE & OS

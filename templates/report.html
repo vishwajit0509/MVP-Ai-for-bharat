@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ report.tender.title }} — Evaluation Report</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="/static/styles.css" />
+    <style>
+      /* Report-page-specific overrides */
+      .report-body {
+        min-height: 100vh;
+      }
+
+      .report-topbar {
+        background: #0d1420;
+        padding: 14px 0;
+        border-bottom: 3px solid transparent;
+        border-image: linear-gradient(90deg, #ff9933 33.33%, #ffffff 33.33% 66.66%, #138808 66.66%) 1;
+        margin-bottom: 0;
+      }
+
+      .report-topbar-inner {
+        width: min(1160px, calc(100vw - 40px));
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .report-topbar-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #d4e0f5;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.75rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .report-topbar-brand span {
+        opacity: 0.6;
+      }
+
+      .report-topbar-actions {
+        display: flex;
+        gap: 8px;
+      }
+
+      .report-topbar .icon-button {
+        min-height: 34px;
+        font-size: 0.82rem;
+        color: #d4e0f5;
+        border-color: rgba(212, 224, 245, 0.2);
+        background: rgba(255,255,255,0.05);
+      }
+
+      .report-topbar .icon-button:hover {
+        background: rgba(255,255,255,0.1);
+        border-color: rgba(212, 224, 245, 0.35);
+      }
+
+      .report-topbar .icon-button.accent {
+        background: #f5a800;
+        border-color: #f5a800;
+        color: #0a0a00;
+        font-weight: 600;
+      }
+
+      /* Main report content */
+      .report-shell {
+        padding-top: 40px;
+      }
+
+      .report-header {
+        padding-bottom: 28px;
+        margin-bottom: 8px;
+      }
+
+      .report-header-left .eyebrow {
+        color: #8a7d6b;
+        font-size: 0.7rem;
+      }
+
+      .report-header-left h1 {
+        font-size: 2.2rem;
+        color: #0d1420;
+        margin: 10px 0 8px;
+        line-height: 1.15;
+      }
+
+      .report-subtitle {
+        font-size: 0.9rem;
+        color: #6b7a8d;
+        margin: 0;
+        font-family: 'IBM Plex Mono', monospace;
+      }
+
+      .report-generated {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.72rem;
+        color: #9ba8b8;
+        margin-top: 6px;
+      }
+
+      /* Status pill variants for report */
+      .report-status.eligible   { background: #d0f5ee; color: #0a6b5c; }
+      .report-status.not-eligible,
+      .report-status.not_eligible { background: #fde8e8; color: #9b2020; }
+      .report-status.manual-review,
+      .report-status.manual_review { background: #fef3cc; color: #7a5c0a; }
+
+      /* Section dividers */
+      .report-section-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 32px 0 14px;
+      }
+
+      .report-section-num {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.68rem;
+        color: #9ba8b8;
+        background: #f0ede8;
+        border: 1px solid #ddd6cc;
+        border-radius: 4px;
+        padding: 3px 7px;
+      }
+
+      .report-section-header h2 {
+        margin: 0;
+        font-size: 1.2rem;
+        color: #0d1420;
+        flex: 1;
+        border-bottom: 1px solid #ddd6cc;
+        padding-bottom: 10px;
+      }
+
+      .report-bidder-status-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 4px;
+      }
+
+      /* Watermark for print */
+      @media print {
+        .report-topbar { display: none; }
+
+        .report-shell { padding-top: 20px; }
+
+        .report-shell::before {
+          content: 'CRPF PROCUREMENT · CONFIDENTIAL';
+          display: block;
+          text-align: center;
+          font-family: 'IBM Plex Mono', monospace;
+          font-size: 0.65rem;
+          letter-spacing: 0.15em;
+          color: #c5bfb6;
+          margin-bottom: 20px;
+          padding-bottom: 12px;
+          border-bottom: 1px solid #ddd6cc;
+        }
+      }
+    </style>
+  </head>
+  <body class="report-body">
+
+    <!-- Top nav bar -->
+    <div class="report-topbar">
+      <div class="report-topbar-inner">
+        <div class="report-topbar-brand">
+          🛡 <span>CRPF · Evaluation Report</span>
+        </div>
+        <div class="report-topbar-actions">
+          <a class="icon-button" href="/">
+            <span class="button-icon">←</span>
+            <span>Return to Console</span>
+          </a>
+          <button class="icon-button accent" onclick="window.print()">
+            <span class="button-icon">⎙</span>
+            <span>Print</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <main class="report-shell">
+
+      <!-- Header -->
+      <div class="report-header">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap">
+          <div class="report-header-left">
+            <div class="eyebrow">Consolidated Procurement Evaluation Report</div>
+            <h1>{{ report.tender.title }}</h1>
+            <p class="report-subtitle">
+              {{ report.tender.authority }}
+              {% if report.tender.reference_no %} · {{ report.tender.reference_no }}{% endif %}
+            </p>
+            <p class="report-generated">Generated {{ report.generated_at if report.generated_at else "—" }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Metrics strip -->
+      <div class="report-summary-grid">
+        <div class="report-metric">
+          <span>Criteria</span>
+          <strong>{{ report.metrics.criteria_count }}</strong>
+        </div>
+        <div class="report-metric">
+          <span>Bidders</span>
+          <strong>{{ report.metrics.bidder_count }}</strong>
+        </div>
+        <div class="report-metric">
+          <span>Eligible</span>
+          <strong>{{ report.metrics.eligible_count }}</strong>
+        </div>
+        <div class="report-metric">
+          <span>Manual Review</span>
+          <strong>{{ report.metrics.review_count }}</strong>
+        </div>
+        <div class="report-metric">
+          <span>Not Eligible</span>
+          <strong>{{ report.metrics.rejected_count }}</strong>
+        </div>
+        <div class="report-metric">
+          <span>Audit Coverage</span>
+          <strong>{{ report.metrics.audit_coverage }}%</strong>
+        </div>
+      </div>
+
+      <!-- Section 1: Criteria Register -->
+      <section class="report-section">
+        <div class="report-section-header">
+          <span class="report-section-num">§ 1</span>
+          <h2>Criteria Register</h2>
+        </div>
+        <div class="report-table-wrap">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Category</th>
+                <th>Criterion</th>
+                <th>Threshold</th>
+                <th>Mandatory</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for criterion in report.criteria %}
+              <tr>
+                <td style="font-family:'IBM Plex Mono',monospace;font-size:0.78rem;font-weight:600;color:#5a3a0a;white-space:nowrap">{{ criterion.code }}</td>
+                <td>
+                  <span style="font-size:0.78rem;padding:3px 8px;border-radius:99px;background:{% if criterion.category == 'Financial' %}#fef3cc{% elif criterion.category == 'Technical' %}#ede8fa{% else %}#d0f5ee{% endif %};color:{% if criterion.category == 'Financial' %}#7a5c0a{% elif criterion.category == 'Technical' %}#5b21b6{% else %}#0a6b5c{% endif %}">{{ criterion.category }}</span>
+                </td>
+                <td style="max-width:320px;font-size:0.875rem">{{ criterion.description }}</td>
+                <td style="font-family:'IBM Plex Mono',monospace;font-size:0.78rem;color:#5a6b7c">{{ criterion.threshold_text or "—" }}</td>
+                <td style="font-family:'IBM Plex Mono',monospace;font-size:0.78rem">
+                  {% if criterion.is_mandatory %}
+                    <span style="color:#7a5c0a;font-weight:600">Yes</span>
+                  {% else %}
+                    <span style="color:#9ba8b8">No</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Section 2: Bidder Verdicts -->
+      <section class="report-section">
+        <div class="report-section-header">
+          <span class="report-section-num">§ 2</span>
+          <h2>Bidder Verdicts</h2>
+        </div>
+
+        {% for bidder in report.bidders %}
+        <article class="report-bidder-block">
+          <div class="report-bidder-head">
+            <div>
+              <h3>{{ bidder.name }}</h3>
+              <div class="report-bidder-status-row">
+                <span style="font-size:0.85rem;color:#6b7a8d">
+                  {{ bidder.organization_type or "Bidder" }}
+                  {% if bidder.city or bidder.state %} · {{ bidder.city }} {{ bidder.state }}{% endif %}
+                </span>
+              </div>
+            </div>
+            <span class="report-status {{ bidder.overall_status | replace('_', '-') }}">
+              {{ bidder.overall_status.replace("_", " ").title() }}
+            </span>
+          </div>
+          <div class="report-table-wrap">
+            <table class="report-table">
+              <thead>
+                <tr>
+                  <th>Criterion</th>
+                  <th>Verdict</th>
+                  <th>Found Value</th>
+                  <th>Evidence</th>
+                  <th>Reviewer Note</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for ev in bidder.evaluations %}
+                <tr>
+                  <td style="font-size:0.82rem;white-space:nowrap">{{ ev.criterion_code }} · {{ ev.criterion_title }}</td>
+                  <td>
+                    <span style="font-size:0.75rem;font-family:'IBM Plex Mono',monospace;padding:3px 8px;border-radius:99px;font-weight:600;
+                      background:{% if ev.effective_verdict == 'eligible' %}#d0f5ee{% elif ev.effective_verdict == 'not_eligible' %}#fde8e8{% else %}#fef3cc{% endif %};
+                      color:{% if ev.effective_verdict == 'eligible' %}#0a6b5c{% elif ev.effective_verdict == 'not_eligible' %}#9b2020{% else %}#7a5c0a{% endif %}">
+                      {{ ev.effective_verdict.replace("_", " ").title() }}
+                    </span>
+                  </td>
+                  <td style="font-family:'IBM Plex Mono',monospace;font-size:0.78rem">{{ ev.found_value or "—" }}</td>
+                  <td style="font-size:0.8rem;color:#5a6b7c;max-width:240px">{{ ev.source_excerpt or "—" }}</td>
+                  <td style="font-size:0.8rem;color:#5a6b7c">{{ ev.reviewer_note or "—" }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </article>
+        {% endfor %}
+      </section>
+
+      <!-- Section 3: Open Review Items -->
+      <section class="report-section">
+        <div class="report-section-header">
+          <span class="report-section-num">§ 3</span>
+          <h2>Open Review Items</h2>
+        </div>
+        <div class="report-table-wrap">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Bidder</th>
+                <th>Criterion</th>
+                <th>Reason</th>
+                <th>Evidence</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in report.review_queue %}
+              <tr>
+                <td style="font-weight:600">{{ item.bidder_name }}</td>
+                <td style="font-family:'IBM Plex Mono',monospace;font-size:0.78rem;white-space:nowrap">{{ item.criterion_code }} · {{ item.criterion_title }}</td>
+                <td style="font-size:0.85rem;color:#5a6b7c">{{ item.verdict_reason }}</td>
+                <td style="font-size:0.82rem;color:#5a6b7c;font-style:italic">{{ item.source_excerpt or "—" }}</td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="4" style="text-align:center;color:#9ba8b8;padding:20px;font-family:'IBM Plex Mono',monospace;font-size:0.82rem">
+                  ✓ No manual review items remain open.
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer style="margin-top:48px;padding-top:20px;border-top:1px solid #ddd6cc;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:0.7rem;color:#9ba8b8;letter-spacing:0.08em">
+        CENTRAL RESERVE POLICE FORCE · GOVERNMENT PROCUREMENT INTELLIGENCE SYSTEM · CONFIDENTIAL
+      </footer>
+
+    </main>
+  </body>
+</html>

@@ -1,214 +1,117 @@
-<div align="center">
+# CRPF Tender Intelligence Console
 
-# 🇮🇳 Bharat Tender Audit Systems
+A full-stack procurement evaluation workspace for the CRPF tender-analysis theme.
 
-### Autonomous AI-Powered Government Procurement Auditor
+This repo now runs as a real web application, not just a console MVP. It ingests tender documents and bidder submissions, extracts structured eligibility criteria, evaluates each bidder against every criterion, produces explainable verdicts, surfaces manual-review cases, and keeps an audit trail for every action.
 
-[![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
-[![LangGraph](https://img.shields.io/badge/LangGraph-Agentic-blueviolet?style=flat-square)](https://langchain-ai.github.io/langgraph/)
-[![Gemini](https://img.shields.io/badge/Gemini-1.5_Pro-4285F4?style=flat-square&logo=google&logoColor=white)](https://deepmind.google/technologies/gemini/)
-[![ChromaDB](https://img.shields.io/badge/ChromaDB-Vector_Store-orange?style=flat-square)](https://www.trychroma.com/)
-[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
+## What the app does
 
-*Developed for the Bharat AI Hackathon — Replacing manual document verification with autonomous AI reasoning.*
+- Upload a tender document and create a procurement workspace.
+- Extract eligibility criteria into structured, reviewable records.
+- Upload bidder submission packs with PDFs, images, text files, or DOCX files.
+- Evaluate each bidder at the criterion level with evidence, found values, and reasons.
+- Mark bidders as `Eligible`, `Not Eligible`, or `Manual Review`.
+- Resolve ambiguous checks through a human-in-the-loop review queue.
+- Export consolidated reports as printable HTML, CSV, or JSON.
+- Maintain an audit trail for document ingestion, extraction, evaluation, and review decisions.
 
-</div>
+## Stack
 
----
+- `FastAPI` for the backend and JSON APIs
+- `Jinja2` and vanilla JS for the frontend
+- `SQLite` as the local audit ledger and report store
+- `PyPDF` for PDF text extraction
+- `python-dotenv` for optional API-key configuration
+- Optional Gemini Vision OCR when `GOOGLE_API_KEY` is configured
 
-## The Problem
+## Why SQLite instead of MongoDB here?
 
-India processes **thousands of government tenders every year**. Each tender requires evaluating multiple bidders across dozens of eligibility criteria — turnover thresholds, GST registrations, years of experience, and more. This process is:
+For this working local build, SQLite is the right fit:
 
-- ⏱️ **Slow** — manual cross-referencing of stacks of PDFs takes weeks
-- ❌ **Error-prone** — human fatigue leads to missed documents and incorrect rejections
-- 🔒 **Opaque** — no audit trail for why a bidder was accepted or rejected
-- 📄 **Multiformat chaos** — bidders submit a mix of digital PDFs and scanned photos
+- zero setup for demo and judging
+- strong auditability for joins across tenders, bidders, criteria, evidence, and review decisions
+- easy export and inspection
 
-**The Bharat Tender Audit System solves all of this autonomously.**
+If you want, this data layer can be swapped for MongoDB later, but the self-contained hackathon build is better served by an embedded audit-grade database.
 
----
+## Current product flow
 
-## What It Does
+1. Tender uploaded
+2. Criteria extracted and normalized
+3. Bidder documents ingested and parsed
+4. Rule-by-rule evaluation runs
+5. Ambiguous checks land in the review queue
+6. Officer decisions update bidder status and audit history
+7. Consolidated report is exported
 
-The system reads a **Notice Inviting Tender (NIT)** PDF — the official rulebook — and automatically extracts every eligibility criterion. It then audits each bidder's submitted documents against those criteria, producing a structured, explainable report for each company.
+## Offline mode vs AI-assisted mode
 
-```
-Tender PDF (NIT) ──► Extract Criteria ──► Audit Bidder A ──► PASS / FAIL + Evidence
-                                       ──► Audit Bidder B ──► PASS / FAIL + Evidence
-                                       ──► Audit Bidder C ──► PASS / FAIL + Evidence
-```
+The app works out of the box in `offline_deterministic` mode:
 
-No manual reading. No missed documents. Full audit trail.
+- PDFs, text files, and DOCX files are parsed locally
+- bundled demo image evidence uses a seeded transcript
+- unparsed scanned files are surfaced for manual review instead of silently failing
 
----
+If you add `GOOGLE_API_KEY` in `.env`, image OCR upgrades to Gemini Vision automatically.
 
-## Tech Stack
-
-| Component | Technology | Role |
-|-----------|-----------|------|
-| **Orchestration** | LangGraph | State machine that drives the audit workflow |
-| **Reasoning LLM** | Gemini 2.5 Pro | Evaluates evidence against criteria thresholds |
-| **OCR / Speed LLM** | Gemini 2.5 Flash | Reads scanned photos and handwritten documents |
-| **Vector Database** | ChromaDB (Persistent) | Stores and retrieves bidder document chunks |
-| **RAG Framework** | LangChain | Document loading, chunking, and embedding |
-| **Terminal UI** | Rich | Professional formatted console output |
-| **Data Contracts** | Pydantic | Validates all structured JSON outputs |
-
----
-
-## Project Structure
-
-```
-AI-FOR-BHARAT-MVP/
-│
-├── config/
-│   ├── settings.py         # Global API config & model versions
-│   └── prompts.yaml        # Centralized AI prompts & instructions
-│
-├── data/
-│   ├── tenders/            # Notice Inviting Tender (NIT) PDFs go here
-│   ├── bidders/            # One sub-folder per bidder (PDFs + scanned images)
-│   └── chroma_db/          # Auto-generated persistent vector memory
-│
-├── src/
-│   ├── engine/
-│   │   ├── parser.py       # PDF text extraction + Gemini Vision OCR
-│   │   └── vector_store.py # Document chunking, embedding & retrieval
-│   │
-│   ├── graph/
-│   │   ├── state.py        # LangGraph shared memory schema
-│   │   ├── nodes.py        # "Judge" node — the core auditor logic
-│   │   └── workflow.py     # Graph connections & routing logic
-│   │
-│   └── schema.py           # Pydantic data contracts for JSON output
-│
-├── main_all.py             # Entry point — runs batch audit for all bidders
-├── .env                    # API keys (never commit this)
-└── requirements.txt
-```
-
----
-
-## Key Features
-
-### 🖼️ Multimodal RAG
-The system automatically detects whether a submitted file is a digital PDF or a scanned photograph. Scanned images are passed through **Gemini Vision**, which "reads" them like a human would — making them fully searchable alongside typed documents.
-
-### 📋 Autonomous Checklist Generation
-The system reads the Tender Rulebook **once** and produces a structured JSON checklist of every eligibility criterion — turnover thresholds, GST requirements, prior experience mandates, and more — without any human tagging.
-
-### 🔒 Collection Isolation
-Each bidder gets their own isolated ChromaDB collection. This guarantees **zero data leakage** between competing companies, even when running batch audits.
-
-### ⚖️ Agentic Threshold Reasoning
-Unlike a basic keyword search, the LangGraph **Judge Node** reasons about evidence. It doesn't just find "₹12 Cr" — it evaluates *"₹12 Cr > ₹5 Cr minimum required → PASS"* and explains why.
-
----
-
-## Getting Started
-
-### Prerequisites
-
-- Python 3.10+
-- A Google AI Studio API Key ([get one here](https://aistudio.google.com/))
-
-### Installation
+## Local setup
 
 ```bash
-# 1. Clone the repository
-git clone https://github.com/vishwajit0509/MVP-Ai-for-bharat.git
-cd ai-for-bharat-mvp
-
-# 2. Install dependencies
-pip install -r requirements.txt
-
-# 3. Set up your environment
-cp .env.example .env
-# Then open .env and add your API keys (see below)
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
+.venv/bin/uvicorn main:app --host 127.0.0.1 --port 8000
 ```
 
-### Environment Variables
+Open:
 
-Create a `.env` file in the root directory:
+- App: [http://127.0.0.1:8000](http://127.0.0.1:8000)
+- Printable seeded report: open it from the dashboard's `Print Report` action after startup
 
-```env
-# Required
-GOOGLE_API_KEY="your_google_ai_studio_key_here"
+## Seeded demo workspace
 
-# Optional — for LangSmith tracing & debugging
-LANGCHAIN_TRACING_V2="true"
-LANGCHAIN_API_KEY="your_langsmith_key_here"
-LANGCHAIN_PROJECT="bharat-tender-audit"
+On first startup, the app auto-loads the bundled CRPF mock tender and three bidder packs:
+
+- `AlphaCorp Construction Solutions`
+- `BetaTech Infrastructure Ltd.`
+- `Gamma Infra Projects`
+
+This gives you an immediate dashboard with:
+
+- extracted tender criteria
+- per-bidder evaluation matrix
+- manual review queue
+- audit trail
+- exportable report
+
+## Main files
+
+```text
+main.py                 FastAPI app and routes
+app/db.py               SQLite schema and connection helpers
+app/analysis.py         document parsing, criteria extraction, and evaluation logic
+app/repository.py       persistence, reporting, and workflow orchestration
+app/seed.py             demo workspace bootstrap
+templates/index.html    main application shell
+templates/report.html   printable report view
+static/styles.css       product UI styling
+static/app.js           frontend rendering and interactions
 ```
 
-### Add Your Data
+## Product features implemented
 
-```
-data/
-├── tenders/
-│   └── your_tender.pdf                      # The NIT / rulebook PDF
-├── output/                                  # Auto-generated audit reports
-└── bidders/
-    ├── Bidder_A_AlphaCorp/
-    │   ├── Annual_Turnover.pdf
-    │   └── GST_Certificate.pdf
-    ├── Bidder_B_BetaTech/
-    │   └── Financial_Report.pdf
-    └── Bidder_C_GammaInfra/
-        └── Scanned_Work_Proof.jpeg          # Scanned images are supported too
-```
+- Tender workspace selector
+- Tender creation modal
+- Bidder upload modal
+- Criteria editor
+- Evaluation matrix
+- Bidder dossier panels
+- Manual review resolution
+- Audit event stream
+- CSV export
+- JSON export
+- Printable report page
 
-Each bidder gets their own folder. Mix and match PDFs and scanned images freely — the system handles both automatically.
+## Notes
 
-### Run the Audit
-
-```bash
-python main_all.py
-```
-
-The system will process every bidder folder and output a structured verdict for each.
-
----
-
-## results 
-
-![alt text](image-2.png)
-![alt text](image-3.png)
-![alt text](image-4.png)
-![alt text](image-5.png)
-![alt text](image-6.png)
-![alt text](image-7.png)
-![alt text](image-8.png)
-
-## Roadmap
-
-The MVP core is complete. The following nodes are planned for v2:
-
-| Node | Purpose | Status |
-|------|---------|--------|
-| **Query Refinement** | If "GST" finds nothing, retry with "Tax ID", "GSTIN", etc. to prevent unfair rejections | 🔲 Planned |
-| **Fraud Detection** | Cross-reference data across documents (e.g., company name must match across GST cert and bank statement) | 🔲 Planned |
-| **Human-in-the-Loop** | Pause the graph and request human review when evidence is "Ambiguous" | 🔲 Planned |
-| **Competency Scoring** | Go beyond Pass/Fail — assign a score based on *how far* a bidder exceeds minimum thresholds | 🔲 Planned |
-
----
-
-## Why This Matters
-
-Government procurement in India is a multi-trillion rupee ecosystem. Even a small reduction in processing time and human error translates to:
-
-- Faster project execution
-- More transparent, auditable decisions
-- Reduced scope for corruption through consistent, documented verdicts
-- A level playing field for smaller bidders whose paperwork is often overlooked
-
----
-
-<div align="center">
-
-Built with ❤️ for the **Bharat AI Hackathon**
-
-*Making India's procurement infrastructure AI-ready, one tender at a time.*
-
-</div>
+- The legacy `src/` prototype code is still in the repo, but the live product now runs through `main.py` and the `app/` package.
+- Scanned image handling is designed to never silently disqualify a bidder. If OCR is unavailable or low confidence, the system routes that criterion to manual review.
