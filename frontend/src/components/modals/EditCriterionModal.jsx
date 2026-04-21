@@ -37,6 +37,7 @@ export function EditCriterionModal({ open, onClose, criterion, tenderId, onSaved
   async function handleSubmit(e) {
     e.preventDefault()
     setLoading(true)
+    const toastId = toast.loading('Saving criterion...')
     try {
       const payload = {
         ...form,
@@ -46,9 +47,9 @@ export function EditCriterionModal({ open, onClose, criterion, tenderId, onSaved
       const data = await api.updateCriterion(tenderId, criterion.id, payload)
       onSaved(data.selected_tender)
       onClose()
-      toast.success('Criterion updated and bidders re-evaluated.')
+      toast.success('Criterion updated and bidders re-evaluated.', { id: toastId })
     } catch (err) {
-      toast.error(err.message || 'Could not update criterion.')
+      toast.error(err.message || 'Could not update criterion.', { id: toastId })
     } finally {
       setLoading(false)
     }
@@ -74,9 +75,9 @@ export function EditCriterionModal({ open, onClose, criterion, tenderId, onSaved
                 type="checkbox"
                 checked={form.is_mandatory}
                 onChange={set('is_mandatory')}
-                className="w-4 h-4 rounded border-white/20 bg-slate-800 accent-amber-500"
+                className="w-4 h-4 rounded border-slate-300 bg-white accent-amber-500"
               />
-              <span className="text-sm text-slate-300 font-medium">Mandatory criterion</span>
+              <span className="text-sm text-slate-700 font-medium">Mandatory criterion</span>
             </label>
           </div>
         </div>
@@ -126,7 +127,7 @@ export function EditCriterionModal({ open, onClose, criterion, tenderId, onSaved
           />
         </div>
         <div className="flex gap-3 pt-2">
-          <button type="button" onClick={onClose} className="btn-ghost flex-1 justify-center">Cancel</button>
+          <button type="button" onClick={() => { toast('Criterion editor closed.', { id: 'criterion-editor' }); onClose() }} className="btn-ghost flex-1 justify-center">Cancel</button>
           <button type="submit" disabled={loading} className="btn-primary flex-1 justify-center">
             {loading
               ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving…</>

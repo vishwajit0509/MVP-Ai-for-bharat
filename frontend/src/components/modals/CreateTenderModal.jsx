@@ -13,6 +13,7 @@ export function CreateTenderModal({ open, onClose, onCreated }) {
     e.preventDefault()
     if (!files.length) { toast.error('Attach at least one tender document.'); return }
     setLoading(true)
+    const toastId = toast.loading('Creating tender workspace...')
     try {
       const fd = new FormData(formRef.current)
       files.forEach(f => fd.append('files', f))
@@ -21,17 +22,25 @@ export function CreateTenderModal({ open, onClose, onCreated }) {
       formRef.current.reset()
       setFiles([])
       onClose()
-      toast.success('Tender workspace created successfully.')
+      toast.success('Tender workspace created successfully.', { id: toastId })
     } catch (err) {
-      toast.error(err.message || 'Could not create tender.')
+      toast.error(err.message || 'Could not create tender.', { id: toastId })
     } finally {
       setLoading(false)
     }
   }
 
+  function selectFiles(nextFiles) {
+    const selected = Array.from(nextFiles)
+    setFiles(selected)
+    if (selected.length) {
+      toast.success(`${selected.length} tender document${selected.length === 1 ? '' : 's'} attached.`, { id: 'tender-files' })
+    }
+  }
+
   function handleDrop(e) {
     e.preventDefault()
-    setFiles(Array.from(e.dataTransfer.files))
+    selectFiles(e.dataTransfer.files)
   }
 
   return (
@@ -80,19 +89,19 @@ export function CreateTenderModal({ open, onClose, onCreated }) {
           <div
             onDrop={handleDrop}
             onDragOver={e => e.preventDefault()}
-            className="border-2 border-dashed border-white/10 hover:border-amber-500/40 rounded-xl p-6 text-center
+            className="border-2 border-dashed border-slate-300 hover:border-amber-500/50 rounded-xl p-7 text-center
                        transition-colors cursor-pointer group"
             onClick={() => document.getElementById('tender-file-input').click()}
           >
-            <Upload className="w-6 h-6 text-slate-600 group-hover:text-amber-500 mx-auto mb-2 transition-colors" />
-            <p className="text-sm text-slate-500 group-hover:text-slate-400">
+            <Upload className="w-7 h-7 text-slate-600 group-hover:text-amber-500 mx-auto mb-3 transition-colors" />
+            <p className="text-base text-slate-600 group-hover:text-slate-700">
               Drop files here or <span className="text-amber-500 font-semibold">browse</span>
             </p>
-            <p className="text-xs text-slate-600 mt-1">PDF, DOCX, TXT, MD, PNG, JPG</p>
+            <p className="text-sm text-slate-600 mt-1.5">PDF, DOCX, TXT, MD, PNG, JPG</p>
             {files.length > 0 && (
               <div className="mt-3 flex flex-wrap gap-1.5 justify-center">
                 {files.map((f, i) => (
-                  <span key={i} className="px-2 py-0.5 bg-amber-500/15 text-amber-400 text-xs rounded-full border border-amber-500/20">
+                  <span key={i} className="px-2.5 py-1 bg-amber-500/15 text-amber-600 text-xs rounded-full border border-amber-500/20">
                     {f.name}
                   </span>
                 ))}
@@ -105,11 +114,11 @@ export function CreateTenderModal({ open, onClose, onCreated }) {
             accept=".pdf,.docx,.txt,.md,.png,.jpg,.jpeg"
             multiple
             className="hidden"
-            onChange={e => setFiles(Array.from(e.target.files))}
+            onChange={e => selectFiles(e.target.files)}
           />
         </div>
         <div className="flex gap-3 pt-2">
-          <button type="button" onClick={onClose} className="btn-ghost flex-1 justify-center">
+          <button type="button" onClick={() => { toast('Tender form closed.', { id: 'new-tender' }); onClose() }} className="btn-ghost flex-1 justify-center">
             Cancel
           </button>
           <button type="submit" disabled={loading} className="btn-primary flex-1 justify-center">

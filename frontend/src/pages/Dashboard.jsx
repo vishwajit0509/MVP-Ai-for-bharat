@@ -21,10 +21,10 @@ function Section({ id, eyebrow, title, children, alt }) {
   return (
     <section
       id={`section-${id}`}
-      className={`px-6 lg:px-8 py-10 scroll-mt-16 relative ${alt ? '' : ''}`}
+      className={`px-7 lg:px-10 py-12 scroll-mt-20 relative ${alt ? '' : ''}`}
     >
       {/* Section divider line */}
-      <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" />
+      <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
 
       <div className="max-w-7xl mx-auto">
         <motion.div
@@ -35,7 +35,7 @@ function Section({ id, eyebrow, title, children, alt }) {
           className="mb-8"
         >
           <p className="section-eyebrow">{eyebrow}</p>
-          <h2 className="text-2xl font-bold text-white tracking-tight">{title}</h2>
+          <h2 className="text-3xl font-bold text-slate-950 tracking-tight">{title}</h2>
         </motion.div>
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -61,15 +61,37 @@ export function Dashboard() {
 
   async function handleTenderChange(id) { await loadBootstrap(id) }
 
+  function openNewTenderForm() {
+    toast('Opening tender form.', { id: 'new-tender' })
+    setNewTenderOpen(true)
+  }
+
+  function openAddBidderForm() {
+    if (!tender) { toast.error('Create or select a tender first.'); return }
+    toast('Opening bidder form.', { id: 'add-bidder' })
+    setAddBidderOpen(true)
+  }
+
+  function openCriterionEditor(criterion) {
+    toast('Opening criterion editor.', { id: 'criterion-editor' })
+    setEditCriterion(criterion)
+  }
+
+  function scrollToMetrics() {
+    toast('Showing overview.', { id: 'section-navigation' })
+    document.getElementById('section-metrics')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
   async function handleEvaluate() {
     if (!tender) return
     setEvaluating(true)
+    const toastId = toast.loading('Running evaluation...')
     try {
       const data = await api.runEvaluation(tender.id)
       updateSelectedTender(data.selected_tender)
-      toast.success('Evaluation completed successfully.')
+      toast.success('Evaluation completed successfully.', { id: toastId })
     } catch (err) {
-      toast.error(err.message || 'Evaluation failed.')
+      toast.error(err.message || 'Evaluation failed.', { id: toastId })
     } finally {
       setEvaluating(false)
     }
@@ -77,7 +99,7 @@ export function Dashboard() {
 
   if (loading && !tender) {
     return (
-      <div className="flex items-center justify-center h-screen bg-[#060a13]">
+      <div className="flex items-center justify-center h-screen bg-[#f7f9fc]">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -104,17 +126,14 @@ export function Dashboard() {
         tenders={tenders}
         system={system}
         onTenderChange={handleTenderChange}
-        onNewTender={() => setNewTenderOpen(true)}
-        onAddBidder={() => {
-          if (!tender) { toast.error('Create or select a tender first.'); return }
-          setAddBidderOpen(true)
-        }}
+        onNewTender={openNewTenderForm}
+        onAddBidder={openAddBidderForm}
         onEvaluate={handleEvaluate}
         evaluating={evaluating}
       >
         {!tender ? (
           /* ─── Premium Empty State ─── */
-          <div className="flex flex-col items-center justify-center min-h-[80vh] text-center px-6 relative">
+          <div className="flex flex-col items-center justify-center min-h-[80vh] text-center px-7 relative">
             {/* Background gradient mesh */}
             <div className="absolute inset-0 gradient-mesh" />
 
@@ -134,27 +153,27 @@ export function Dashboard() {
                 </div>
               </div>
 
-              <h1 className="text-3xl lg:text-4xl font-black text-white tracking-tight mb-3">
+              <h1 className="text-4xl lg:text-5xl font-black text-slate-950 tracking-tight mb-4">
                 CRPF Tender Intelligence
               </h1>
-              <p className="text-lg text-slate-500 max-w-lg mx-auto leading-relaxed mb-8">
+              <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed mb-9">
                 Create a workspace to begin AI-powered eligibility analysis
                 and audit-first bidder evaluation.
               </p>
               <button
-                onClick={() => setNewTenderOpen(true)}
-                className="btn-primary px-8 py-3.5 text-sm font-bold"
+                onClick={openNewTenderForm}
+                className="btn-primary px-9 py-4 text-base font-bold"
               >
-                <Sparkles className="w-4 h-4" />
+                <Sparkles className="w-5 h-5" />
                 Create First Workspace
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-5 h-5" />
               </button>
 
               {/* Feature pills */}
               <div className="flex flex-wrap justify-center gap-3 mt-10">
                 {['AI Criteria Extraction', 'Automated Evaluation', 'Full Audit Trail', 'Export Reports'].map(f => (
-                  <div key={f} className="px-3.5 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.06]
-                                          text-[11px] text-slate-500 font-medium">
+                  <div key={f} className="px-4 py-2 rounded-full bg-white/80 border border-slate-200
+                                          text-xs text-slate-600 font-medium shadow-sm">
                     {f}
                   </div>
                 ))}
@@ -164,17 +183,17 @@ export function Dashboard() {
         ) : (
           <>
             {/* ─── Hero Section ─── */}
-            <div className="px-6 lg:px-8 pt-8 pb-8 relative gradient-mesh">
+            <div className="px-7 lg:px-10 pt-12 pb-12 relative gradient-mesh landing-animated overflow-hidden">
               <div className="max-w-7xl mx-auto relative z-10">
                 <motion.div
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                  className="flex flex-col lg:flex-row lg:items-start gap-6"
+                  className="flex flex-col lg:flex-row lg:items-start gap-8"
                 >
                   {/* Tender info */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2.5 flex-wrap mb-2">
+                    <div className="flex items-center gap-3 flex-wrap mb-3">
                       <p className="section-eyebrow">{tender.authority || 'Procurement Authority'}</p>
                       {system && (
                         <StatusBadge
@@ -183,38 +202,52 @@ export function Dashboard() {
                         />
                       )}
                     </div>
-                    <h1 className="text-2xl lg:text-3xl font-black text-white leading-snug tracking-tight mb-2.5">
+                    <h1 className="text-3xl lg:text-4xl font-black text-slate-950 leading-snug tracking-tight mb-3">
                       {tender.title}
                     </h1>
                     {tender.summary && (
-                      <p className="text-slate-400 text-sm leading-relaxed max-w-2xl">{tender.summary}</p>
+                      <p className="text-slate-600 text-base leading-relaxed max-w-3xl">{tender.summary}</p>
                     )}
 
                     {/* Meta grid */}
-                    <div className="flex flex-wrap gap-6 mt-5">
+                    <div className="flex flex-wrap gap-7 mt-6">
                       {[
                         { label: 'Reference', value: tender.reference_no || 'Pending', mono: true },
                         { label: 'Status', badge: tender.status },
-                        { label: 'Open Reviews', value: tender.review_queue?.length ?? 0, color: 'text-amber-400' },
-                        { label: 'Audit Coverage', value: `${tender.metrics?.audit_coverage ?? 0}%`, color: 'text-emerald-400' },
+                        { label: 'Open Reviews', value: tender.review_queue?.length ?? 0, color: 'text-amber-600' },
+                        { label: 'Audit Coverage', value: `${tender.metrics?.audit_coverage ?? 0}%`, color: 'text-emerald-600' },
                         { label: 'Last Updated', value: formatDate(tender.updated_at), mono: true },
                       ].map(item => (
                         <div key={item.label}>
-                          <span className="text-[9px] font-mono font-bold text-slate-600 uppercase tracking-[0.15em]">
+                          <span className="text-[10px] font-mono font-bold text-slate-600 uppercase tracking-[0.15em]">
                             {item.label}
                           </span>
                           {item.badge ? (
                             <div className="mt-1"><StatusBadge status={item.badge} /></div>
                           ) : (
-                            <div className={`text-sm font-bold mt-0.5 tabular-nums
-                                            ${item.mono ? 'font-mono text-xs text-slate-300' : ''}
-                                            ${item.color || 'text-white'}`}>
+                            <div className={`text-base font-bold mt-1 tabular-nums
+                                            ${item.mono ? 'font-mono text-sm text-slate-600' : ''}
+                                            ${item.color || 'text-slate-950'}`}>
                               {item.value}
                             </div>
                           )}
                         </div>
                       ))}
                     </div>
+
+                    <motion.button
+                      type="button"
+                      onClick={scrollToMetrics}
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.45, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                      className="mt-7 inline-flex items-center gap-2.5 rounded-xl border border-amber-200 bg-white/75 px-5 py-2.5
+                                 text-sm font-bold text-amber-700 shadow-sm transition-all hover:-translate-y-0.5
+                                 hover:border-amber-300 hover:bg-amber-50"
+                    >
+                      View workspace
+                      <ArrowRight className="w-4 h-4 rotate-90" />
+                    </motion.button>
                   </div>
 
                   {/* Export actions */}
@@ -225,8 +258,9 @@ export function Dashboard() {
                       { href: api.getReportJsonUrl(tender.id), icon: FileJson, label: 'Open JSON', target: '_blank' },
                     ].map(({ href, icon: Icon, label, target }) => (
                       <a key={label} href={href} target={target} rel="noreferrer"
-                         className="btn-ghost text-xs py-2">
-                        <Icon className="w-3.5 h-3.5" /> {label}
+                         onClick={() => toast(`Opening ${label}.`, { id: `open-${label}` })}
+                         className="btn-ghost text-sm py-2.5">
+                        <Icon className="w-4 h-4" /> {label}
                       </a>
                     ))}
                   </div>
@@ -235,7 +269,7 @@ export function Dashboard() {
             </div>
 
             {/* ─── Metrics ─── */}
-            <section id="section-metrics" className="px-6 lg:px-8 py-6 scroll-mt-16">
+            <section id="section-metrics" className="px-7 lg:px-10 py-8 scroll-mt-20">
               <div className="max-w-7xl mx-auto">
                 <MetricCards metrics={tender.metrics} />
               </div>
@@ -243,7 +277,7 @@ export function Dashboard() {
 
             {/* ─── Criteria ─── */}
             <Section id="criteria" eyebrow="01 · Tender Understanding" title="Eligibility Criteria">
-              <CriteriaGrid criteria={tender.criteria} onEditCriterion={c => setEditCriterion(c)} />
+              <CriteriaGrid criteria={tender.criteria} onEditCriterion={openCriterionEditor} />
             </Section>
 
             {/* ─── Matrix ─── */}

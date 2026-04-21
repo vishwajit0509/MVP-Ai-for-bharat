@@ -18,7 +18,7 @@ function ConfidenceBar({ value }) {
                 pct >= 50 ? 'from-amber-400 to-amber-600' : 'from-rose-400 to-rose-600'
   return (
     <div className="flex items-center gap-2.5">
-      <div className="flex-1 h-1.5 bg-white/[0.04] rounded-full overflow-hidden">
+      <div className="flex-1 h-1.5 bg-slate-200/80 rounded-full overflow-hidden">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${pct}%` }}
@@ -26,7 +26,7 @@ function ConfidenceBar({ value }) {
           className={`h-full bg-gradient-to-r ${color} rounded-full`}
         />
       </div>
-      <span className="text-[10px] font-mono font-bold text-slate-500 w-8 text-right tabular-nums">{pct}%</span>
+      <span className="text-[11px] font-mono font-bold text-slate-500 w-9 text-right tabular-nums">{pct}%</span>
     </div>
   )
 }
@@ -35,11 +35,11 @@ export function CriteriaGrid({ criteria, onEditCriterion }) {
   if (!criteria?.length) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center mb-4">
-          <Sparkles className="w-7 h-7 text-slate-700" />
+        <div className="w-16 h-16 rounded-2xl bg-white border border-slate-200 flex items-center justify-center mb-4 shadow-sm">
+          <Sparkles className="w-8 h-8 text-slate-400" />
         </div>
-        <p className="text-slate-400 font-semibold">No criteria extracted yet</p>
-        <p className="text-slate-600 text-sm mt-1.5">Upload tender documents to begin AI extraction.</p>
+        <p className="text-slate-700 text-lg font-semibold">No criteria extracted yet</p>
+        <p className="text-slate-500 text-base mt-1.5">Upload tender documents to begin AI extraction.</p>
       </div>
     )
   }
@@ -55,7 +55,7 @@ export function CriteriaGrid({ criteria, onEditCriterion }) {
         <motion.article
           key={criterion.id}
           variants={item}
-          className="glass-card p-5 group hover:border-white/[0.1] hover:-translate-y-1 transition-all duration-300 relative overflow-hidden"
+          className="glass-card p-6 group hover:border-amber-200 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden"
         >
           {/* Hover glow effect */}
           <div className="absolute inset-0 bg-gradient-to-br from-amber-500/[0.03] to-transparent opacity-0
@@ -65,20 +65,20 @@ export function CriteriaGrid({ criteria, onEditCriterion }) {
             {/* Header */}
             <div className="flex items-start justify-between gap-3 mb-3">
               <div className="min-w-0">
-                <div className="font-mono text-[10px] font-black tracking-[0.2em] text-gradient mb-1">
+                <div className="font-mono text-[11px] font-black tracking-[0.2em] text-gradient mb-1.5">
                   {criterion.code}
                 </div>
-                <h3 className="font-bold text-slate-100 text-sm leading-snug">{criterion.title}</h3>
+                <h3 className="font-bold text-slate-950 text-base leading-snug">{criterion.title}</h3>
               </div>
               <div className="flex flex-col gap-1.5 items-end shrink-0">
                 <StatusBadge status={criterion.category?.toLowerCase()} label={criterion.category} />
                 <div className="flex items-center gap-1">
                   {criterion.is_mandatory ? (
-                    <Lock className="w-2.5 h-2.5 text-rose-400/60" />
+                    <Lock className="w-3 h-3 text-rose-400/60" />
                   ) : (
-                    <Unlock className="w-2.5 h-2.5 text-slate-600" />
+                    <Unlock className="w-3 h-3 text-slate-600" />
                   )}
-                  <span className={`text-[9px] font-bold uppercase tracking-wider ${
+                  <span className={`text-[10px] font-bold uppercase tracking-wider ${
                     criterion.is_mandatory ? 'text-rose-400/70' : 'text-slate-600'
                   }`}>
                     {criterion.is_mandatory ? 'Required' : 'Optional'}
@@ -88,16 +88,16 @@ export function CriteriaGrid({ criteria, onEditCriterion }) {
             </div>
 
             {/* Description */}
-            <p className="text-slate-400 text-xs leading-relaxed mb-3 line-clamp-3">
+            <p className="text-slate-600 text-sm leading-relaxed mb-4 line-clamp-3">
               {criterion.description}
             </p>
 
             {/* Threshold */}
             {criterion.threshold_text && (
-              <div className="text-xs text-slate-500 rounded-xl px-3.5 py-2.5 mb-4
-                              border border-amber-500/10 bg-amber-500/[0.03]">
-                <span className="text-gradient font-bold text-[10px] uppercase tracking-wider">Threshold</span>
-                <div className="mt-0.5 text-slate-400">{criterion.threshold_text}</div>
+              <div className="text-sm text-slate-600 rounded-xl px-4 py-3 mb-4
+                              border border-amber-200 bg-amber-50/70">
+                <span className="text-gradient font-bold text-[11px] uppercase tracking-wider">Threshold</span>
+                <div className="mt-0.5 text-slate-600">{criterion.threshold_text}</div>
               </div>
             )}
 
@@ -105,14 +105,14 @@ export function CriteriaGrid({ criteria, onEditCriterion }) {
             <div className="space-y-2 mt-auto">
               <ConfidenceBar value={criterion.extraction_confidence} />
               <div className="flex items-center justify-between">
-                <span className="text-[9px] text-slate-600 font-mono uppercase tracking-wider">AI Confidence</span>
+                <span className="text-[10px] text-slate-600 font-mono uppercase tracking-wider">AI Confidence</span>
                 <button
                   onClick={() => onEditCriterion(criterion)}
-                  className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500
-                             hover:text-amber-400 transition-all px-2.5 py-1.5 rounded-lg
+                  className="flex items-center gap-1.5 text-xs font-bold text-slate-500
+                             hover:text-amber-500 transition-all px-3 py-2 rounded-lg
                              hover:bg-amber-500/10 group/btn"
                 >
-                  <Pencil className="w-3 h-3 group-hover/btn:rotate-[-12deg] transition-transform" />
+                  <Pencil className="w-3.5 h-3.5 group-hover/btn:rotate-[-12deg] transition-transform" />
                   Edit
                 </button>
               </div>

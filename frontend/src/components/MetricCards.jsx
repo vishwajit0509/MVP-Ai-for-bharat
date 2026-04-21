@@ -112,8 +112,8 @@ export function MetricCards({ metrics }) {
         <motion.div
           key={key}
           variants={item}
-          className={`relative rounded-2xl border ${borderColor} p-5 overflow-hidden
-                      ${glowColor} hover:scale-[1.03] transition-all duration-300 cursor-default group shimmer`}
+          className={`relative rounded-2xl border ${borderColor} bg-white/90 p-6 overflow-hidden
+                      ${glowColor} card-hover-glow hover:scale-[1.03] transition-all duration-300 cursor-default group shimmer`}
         >
           {/* Background gradient */}
           <div className={`absolute inset-0 bg-gradient-to-br ${gradient}`} />
@@ -125,15 +125,15 @@ export function MetricCards({ metrics }) {
 
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-4">
-              <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">{label}</span>
+              <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-slate-500">{label}</span>
               <div className="relative">
-                <Icon className={`w-4.5 h-4.5 ${iconColor} opacity-80`} />
+                <Icon className={`w-5 h-5 ${iconColor} opacity-80`} />
               </div>
             </div>
-            <div className="text-4xl font-black text-white leading-none tracking-tight tabular-nums">
+            <div className="text-5xl font-black text-slate-950 leading-none tracking-tight tabular-nums">
               <AnimatedNumber value={metrics[key] ?? 0} />
             </div>
-            <div className="mt-2 text-[10px] text-slate-500 font-medium">{sub}</div>
+            <div className="mt-3 text-xs text-slate-500 font-medium">{sub}</div>
           </div>
         </motion.div>
       ))}

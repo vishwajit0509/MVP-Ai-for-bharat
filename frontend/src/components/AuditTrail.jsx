@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { formatDate, tryParse } from '../utils/cn'
 import { Clock, User, ChevronDown, ChevronUp } from 'lucide-react'
+import toast from 'react-hot-toast'
 
 const EVENT_COLORS = {
   'tender.created':     { dot: 'bg-blue-500', ring: 'ring-blue-500/20', line: 'from-blue-500/40' },
@@ -32,11 +33,11 @@ export function AuditTrail({ auditEvents }) {
   if (!auditEvents?.length) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center mb-4">
-          <Clock className="w-7 h-7 text-slate-700" />
+        <div className="w-16 h-16 rounded-2xl bg-white border border-slate-200 flex items-center justify-center mb-4 shadow-sm">
+          <Clock className="w-8 h-8 text-slate-400" />
         </div>
-        <p className="text-slate-400 font-semibold">No audit events yet</p>
-        <p className="text-slate-600 text-sm mt-1.5">Events will appear as actions are taken.</p>
+        <p className="text-slate-700 text-lg font-semibold">No audit events yet</p>
+        <p className="text-slate-500 text-base mt-1.5">Events will appear as actions are taken.</p>
       </div>
     )
   }
@@ -45,7 +46,7 @@ export function AuditTrail({ auditEvents }) {
     <div>
       <div className="relative pl-6">
         {/* Vertical line */}
-        <div className="absolute left-[9px] top-2 bottom-2 w-px bg-gradient-to-b from-amber-500/20 via-white/[0.04] to-transparent" />
+        <div className="absolute left-[9px] top-2 bottom-2 w-px bg-gradient-to-b from-amber-500/25 via-slate-200 to-transparent" />
 
         <div className="space-y-1">
           {visible.map((event, i) => {
@@ -56,33 +57,33 @@ export function AuditTrail({ auditEvents }) {
                 initial={{ opacity: 0, x: -12 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.025, duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                className="relative flex gap-4 py-2 group"
+                className="relative flex gap-5 py-2.5 group"
               >
                 {/* Dot with ring */}
                 <div className="absolute -left-6 mt-[7px]">
                   <div className={`w-[11px] h-[11px] rounded-full ${colors.dot}
-                                   ring-[3px] ${colors.ring} ring-offset-1 ring-offset-[#060a13]`} />
+                                   ring-[3px] ${colors.ring} ring-offset-1 ring-offset-[#f7f9fc]`} />
                 </div>
 
                 {/* Card */}
-                <div className="flex-1 glass-card px-4 py-3 group-hover:border-white/[0.08] transition-all duration-200">
+                <div className="flex-1 glass-card px-5 py-4 group-hover:border-amber-200 transition-all duration-200">
                   <div className="flex items-center justify-between gap-2 flex-wrap">
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-[11px] font-bold text-slate-200">
+                      <span className="font-mono text-xs font-bold text-slate-800">
                         {event.event_type}
                       </span>
-                      <span className="text-[9px] font-mono text-slate-600 flex items-center gap-1">
-                        <User className="w-2.5 h-2.5" />
+                      <span className="text-[10px] font-mono text-slate-600 flex items-center gap-1.5">
+                        <User className="w-3 h-3" />
                         {event.actor}
                       </span>
                     </div>
-                    <span className="text-[10px] text-slate-600 font-mono tabular-nums flex items-center gap-1">
-                      <Clock className="w-2.5 h-2.5" />
+                    <span className="text-[11px] text-slate-600 font-mono tabular-nums flex items-center gap-1.5">
+                      <Clock className="w-3 h-3" />
                       {formatDate(event.created_at)}
                     </span>
                   </div>
                   {event.details_json && (
-                    <div className="text-[10px] text-slate-600 mt-1.5 font-mono truncate leading-relaxed">
+                    <div className="text-xs text-slate-600 mt-2 font-mono truncate leading-relaxed">
                       {formatDetails(event.details_json)}
                     </div>
                   )}
@@ -95,8 +96,11 @@ export function AuditTrail({ auditEvents }) {
 
       {auditEvents.length > 12 && (
         <button
-          onClick={() => setShowAll(s => !s)}
-          className="btn-ghost w-full justify-center text-sm mt-4 py-2.5"
+          onClick={() => setShowAll(s => {
+            toast(s ? 'Showing recent audit events.' : 'Showing all audit events.', { id: 'audit-toggle' })
+            return !s
+          })}
+          className="btn-ghost w-full justify-center text-base mt-5 py-3"
         >
           {showAll ? (
             <><ChevronUp className="w-4 h-4" /> Show less</>

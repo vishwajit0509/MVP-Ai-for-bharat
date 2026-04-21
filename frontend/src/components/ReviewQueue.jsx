@@ -13,12 +13,13 @@ function ReviewCard({ item, onResolved }) {
   async function handleSubmit(e) {
     e.preventDefault()
     setSaving(true)
+    const toastId = toast.loading('Saving review decision...')
     try {
       const data = await api.resolveReview(item.id, decision, note)
       onResolved(data.selected_tender)
-      toast.success('Review decision saved to audit trail.')
+      toast.success('Review decision saved to audit trail.', { id: toastId })
     } catch (err) {
-      toast.error(err.message || 'Could not save review.')
+      toast.error(err.message || 'Could not save review.', { id: toastId })
     } finally {
       setSaving(false)
     }
@@ -33,16 +34,16 @@ function ReviewCard({ item, onResolved }) {
       {/* Amber accent top */}
       <div className="h-px bg-gradient-to-r from-amber-500/40 via-amber-500/10 to-transparent" />
 
-      <div className="p-5 space-y-4">
+      <div className="p-6 space-y-5">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-start gap-3 min-w-0">
             {/* Icon */}
-            <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/15 flex items-center justify-center shrink-0 mt-0.5">
-              <AlertTriangle className="w-4 h-4 text-amber-400" />
+            <div className="w-11 h-11 rounded-xl bg-amber-500/10 border border-amber-500/15 flex items-center justify-center shrink-0 mt-0.5">
+              <AlertTriangle className="w-5 h-5 text-amber-500" />
             </div>
             <div className="min-w-0">
-              <h3 className="font-bold text-white text-[15px]">{item.bidder_name}</h3>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <h3 className="font-bold text-slate-950 text-lg">{item.bidder_name}</h3>
+              <p className="text-sm text-slate-500 mt-1">
                 <span className="font-mono font-bold text-gradient tracking-wider">{item.criterion_code}</span>
                 <span className="text-slate-700 mx-1.5">·</span>
                 {item.criterion_title}
@@ -58,23 +59,26 @@ function ReviewCard({ item, onResolved }) {
           </div>
         </div>
 
-        <p className="text-sm text-slate-400 leading-relaxed">{item.verdict_reason}</p>
+        <p className="text-base text-slate-600 leading-relaxed">{item.verdict_reason}</p>
 
         {item.source_excerpt && (
-          <blockquote className="border-l-2 border-amber-500/30 pl-4 py-2 text-xs text-slate-500 italic leading-relaxed
-                                 bg-amber-500/[0.02] rounded-r-xl">
+          <blockquote className="border-l-2 border-amber-500/30 pl-4 py-3 text-sm text-slate-600 italic leading-relaxed
+                                 bg-amber-50/70 rounded-r-xl">
             <MessageSquare className="w-3 h-3 text-amber-600 mb-1.5 inline-block mr-1 -mt-0.5" />
             {item.source_excerpt}
           </blockquote>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-3 pt-3 border-t border-white/[0.04]">
+        <form onSubmit={handleSubmit} className="space-y-3 pt-3 border-t border-slate-200">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="form-label">Decision</label>
               <select
                 value={decision}
-                onChange={e => setDecision(e.target.value)}
+                onChange={e => {
+                  setDecision(e.target.value)
+                  toast('Review decision changed.', { id: `review-decision-${item.id}` })
+                }}
                 className="form-input"
               >
                 <option value="eligible">✓ Mark Eligible</option>
@@ -110,20 +114,20 @@ export function ReviewQueue({ reviewQueue, onResolved }) {
   if (!reviewQueue?.length) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-emerald-500/[0.06] border border-emerald-500/15 flex items-center justify-center mb-4">
-          <CheckCircle2 className="w-7 h-7 text-emerald-500/60" />
+        <div className="w-20 h-20 rounded-2xl bg-emerald-500/[0.06] border border-emerald-500/15 flex items-center justify-center mb-4">
+          <CheckCircle2 className="w-8 h-8 text-emerald-500/60" />
         </div>
-        <p className="text-slate-300 font-bold">All clear — nothing in the review queue</p>
-        <p className="text-slate-600 text-sm mt-1.5">All criteria have resolved verdicts.</p>
+        <p className="text-slate-700 text-lg font-bold">All clear — nothing in the review queue</p>
+        <p className="text-slate-600 text-base mt-1.5">All criteria have resolved verdicts.</p>
       </div>
     )
   }
 
   return (
     <div className="space-y-4">
-      <div className="glass-card px-4 py-3 flex items-center gap-2">
-        <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-        <span className="text-sm text-slate-400">
+      <div className="glass-card px-5 py-4 flex items-center gap-3">
+        <div className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse" />
+        <span className="text-base text-slate-600">
           <span className="font-bold text-amber-400 tabular-nums">{reviewQueue.length}</span>
           {' '}item{reviewQueue.length !== 1 ? 's' : ''} awaiting officer judgement
         </span>

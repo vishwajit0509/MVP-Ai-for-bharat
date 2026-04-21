@@ -14,6 +14,7 @@ export function AddBidderModal({ open, onClose, tenderId, onAdded }) {
     if (!files.length) { toast.error('Attach at least one bidder document.'); return }
     if (!tenderId) { toast.error('No tender workspace selected.'); return }
     setLoading(true)
+    const toastId = toast.loading('Adding bidder submission...')
     try {
       const fd = new FormData(formRef.current)
       files.forEach(f => fd.append('files', f))
@@ -22,11 +23,19 @@ export function AddBidderModal({ open, onClose, tenderId, onAdded }) {
       formRef.current.reset()
       setFiles([])
       onClose()
-      toast.success('Bidder submission added and evaluated.')
+      toast.success('Bidder submission added and evaluated.', { id: toastId })
     } catch (err) {
-      toast.error(err.message || 'Could not add bidder.')
+      toast.error(err.message || 'Could not add bidder.', { id: toastId })
     } finally {
       setLoading(false)
+    }
+  }
+
+  function selectFiles(nextFiles) {
+    const selected = Array.from(nextFiles)
+    setFiles(selected)
+    if (selected.length) {
+      toast.success(`${selected.length} bidder document${selected.length === 1 ? '' : 's'} attached.`, { id: 'bidder-files' })
     }
   }
 
@@ -64,20 +73,20 @@ export function AddBidderModal({ open, onClose, tenderId, onAdded }) {
         <div>
           <label className="form-label">Submission Documents</label>
           <div
-            onDrop={e => { e.preventDefault(); setFiles(Array.from(e.dataTransfer.files)) }}
+            onDrop={e => { e.preventDefault(); selectFiles(e.dataTransfer.files) }}
             onDragOver={e => e.preventDefault()}
-            className="border-2 border-dashed border-white/10 hover:border-violet-500/40 rounded-xl p-5 text-center
+            className="border-2 border-dashed border-slate-300 hover:border-violet-500/50 rounded-xl p-7 text-center
                        transition-colors cursor-pointer group"
             onClick={() => document.getElementById('bidder-file-input').click()}
           >
-            <Upload className="w-5 h-5 text-slate-600 group-hover:text-violet-400 mx-auto mb-2 transition-colors" />
-            <p className="text-sm text-slate-500">
-              Drop files or <span className="text-violet-400 font-semibold">browse</span>
+            <Upload className="w-7 h-7 text-slate-600 group-hover:text-violet-500 mx-auto mb-3 transition-colors" />
+            <p className="text-base text-slate-600">
+              Drop files or <span className="text-violet-600 font-semibold">browse</span>
             </p>
             {files.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-1.5 justify-center">
                 {files.map((f, i) => (
-                  <span key={i} className="px-2 py-0.5 bg-violet-500/15 text-violet-400 text-xs rounded-full border border-violet-500/20">
+                  <span key={i} className="px-2.5 py-1 bg-violet-500/15 text-violet-600 text-xs rounded-full border border-violet-500/20">
                     {f.name}
                   </span>
                 ))}
@@ -90,11 +99,11 @@ export function AddBidderModal({ open, onClose, tenderId, onAdded }) {
             accept=".pdf,.docx,.txt,.md,.png,.jpg,.jpeg"
             multiple
             className="hidden"
-            onChange={e => setFiles(Array.from(e.target.files))}
+            onChange={e => selectFiles(e.target.files)}
           />
         </div>
         <div className="flex gap-3 pt-2">
-          <button type="button" onClick={onClose} className="btn-ghost flex-1 justify-center">Cancel</button>
+          <button type="button" onClick={() => { toast('Bidder form closed.', { id: 'add-bidder' }); onClose() }} className="btn-ghost flex-1 justify-center">Cancel</button>
           <button type="submit" disabled={loading} className="btn-primary flex-1 justify-center">
             {loading
               ? <><Loader2 className="w-4 h-4 animate-spin" /> Adding…</>
