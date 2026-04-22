@@ -15,22 +15,24 @@ import { EditCriterionModal } from '../components/modals/EditCriterionModal'
 import { useTender } from '../hooks/useTender'
 import { api } from '../api/client'
 import { formatDate } from '../utils/cn'
+import { useScrollContainer } from '../components/Layout'
 import toast from 'react-hot-toast'
 
-function Section({ id, eyebrow, title, children, alt }) {
+function Section({ id, eyebrow, title, children }) {
+  const scrollContainerRef = useScrollContainer()
+
   return (
     <section
       id={`section-${id}`}
-      className={`px-7 lg:px-10 py-12 scroll-mt-20 relative ${alt ? '' : ''}`}
+      className="px-7 lg:px-10 py-14 scroll-mt-20 relative"
     >
-      {/* Section divider line */}
-      <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+      <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-stone-300/90 to-transparent" />
 
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-50px' }}
+          viewport={{ once: true, margin: '-50px', root: scrollContainerRef }}
           transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
           className="mb-8"
         >
@@ -40,7 +42,7 @@ function Section({ id, eyebrow, title, children, alt }) {
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-30px' }}
+          viewport={{ once: true, margin: '-30px', root: scrollContainerRef }}
           transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
         >
           {children}
@@ -183,7 +185,7 @@ export function Dashboard() {
         ) : (
           <>
             {/* ─── Hero Section ─── */}
-            <div className="px-7 lg:px-10 pt-12 pb-12 relative gradient-mesh landing-animated overflow-hidden">
+            <div className="px-7 lg:px-10 pt-14 pb-12 relative dashboard-hero overflow-hidden">
               <div className="max-w-7xl mx-auto relative z-10">
                 <motion.div
                   initial={{ opacity: 0, y: 16 }}
@@ -193,7 +195,7 @@ export function Dashboard() {
                 >
                   {/* Tender info */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 flex-wrap mb-3">
+                    <div className="flex items-center gap-3 flex-wrap mb-4">
                       <p className="section-eyebrow">{tender.authority || 'Procurement Authority'}</p>
                       {system && (
                         <StatusBadge
@@ -210,7 +212,7 @@ export function Dashboard() {
                     )}
 
                     {/* Meta grid */}
-                    <div className="flex flex-wrap gap-7 mt-6">
+                    <div className="grid grid-cols-2 gap-x-8 gap-y-5 mt-8 max-w-3xl lg:grid-cols-5">
                       {[
                         { label: 'Reference', value: tender.reference_no || 'Pending', mono: true },
                         { label: 'Status', badge: tender.status },
@@ -218,7 +220,7 @@ export function Dashboard() {
                         { label: 'Audit Coverage', value: `${tender.metrics?.audit_coverage ?? 0}%`, color: 'text-emerald-600' },
                         { label: 'Last Updated', value: formatDate(tender.updated_at), mono: true },
                       ].map(item => (
-                        <div key={item.label}>
+                        <div key={item.label} className="border-l border-stone-300/80 pl-4 first:border-l-0 first:pl-0">
                           <span className="text-[10px] font-mono font-bold text-slate-600 uppercase tracking-[0.15em]">
                             {item.label}
                           </span>
@@ -241,9 +243,9 @@ export function Dashboard() {
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.45, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                      className="mt-7 inline-flex items-center gap-2.5 rounded-xl border border-amber-200 bg-white/75 px-5 py-2.5
-                                 text-sm font-bold text-amber-700 shadow-sm transition-all hover:-translate-y-0.5
-                                 hover:border-amber-300 hover:bg-amber-50"
+                      className="mt-8 inline-flex items-center gap-2.5 rounded-full border border-amber-300/80 bg-white/88 px-5 py-2.5
+                                 text-sm font-bold text-amber-800 shadow-[0_14px_35px_rgba(120,53,15,0.08)] transition-all
+                                 hover:-translate-y-0.5 hover:border-amber-400 hover:bg-amber-50/90"
                     >
                       View workspace
                       <ArrowRight className="w-4 h-4 rotate-90" />

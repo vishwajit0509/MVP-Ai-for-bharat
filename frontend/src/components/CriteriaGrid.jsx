@@ -2,6 +2,7 @@ import React from 'react'
 import { motion } from 'framer-motion'
 import { Pencil, Sparkles, Lock, Unlock } from 'lucide-react'
 import { StatusBadge } from './StatusBadge'
+import { cn } from '../utils/cn'
 
 const container = {
   hidden: {},
@@ -15,7 +16,7 @@ const item = {
 function ConfidenceBar({ value }) {
   const pct = Math.round((value || 0) * 100)
   const color = pct >= 80 ? 'from-emerald-400 to-emerald-600' :
-                pct >= 50 ? 'from-amber-400 to-amber-600' : 'from-rose-400 to-rose-600'
+    pct >= 50 ? 'from-amber-400 to-amber-600' : 'from-rose-400 to-rose-600'
   return (
     <div className="flex items-center gap-2.5">
       <div className="flex-1 h-1.5 bg-slate-200/80 rounded-full overflow-hidden">
@@ -72,17 +73,23 @@ export function CriteriaGrid({ criteria, onEditCriterion }) {
               </div>
               <div className="flex flex-col gap-1.5 items-end shrink-0">
                 <StatusBadge status={criterion.category?.toLowerCase()} label={criterion.category} />
-                <div className="flex items-center gap-1">
+                <div className={cn(
+                  "flex items-center gap-1.5 px-2.5 py-1 rounded-md border backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5",
+                  criterion.is_mandatory
+                    ? "bg-rose-500/[0.05] border-rose-500/20 shadow-[0_2px_8px_rgba(244,63,94,0.04)]"
+                    : "bg-slate-500/[0.05] border-slate-500/20"
+                )}>
                   {criterion.is_mandatory ? (
-                    <Lock className="w-3 h-3 text-rose-400/60" />
+                    <>
+                      <Lock className="w-3 h-3 text-rose-500" />
+                      <span className="text-[10px] leading-none font-bold uppercase tracking-wider text-rose-600 translate-y-[0.5px]">Required</span>
+                    </>
                   ) : (
-                    <Unlock className="w-3 h-3 text-slate-600" />
+                    <>
+                      <Unlock className="w-3 h-3 text-slate-400" />
+                      <span className="text-[10px] leading-none font-bold uppercase tracking-wider text-slate-500 translate-y-[0.5px]">Optional</span>
+                    </>
                   )}
-                  <span className={`text-[10px] font-bold uppercase tracking-wider ${
-                    criterion.is_mandatory ? 'text-rose-400/70' : 'text-slate-600'
-                  }`}>
-                    {criterion.is_mandatory ? 'Required' : 'Optional'}
-                  </span>
                 </div>
               </div>
             </div>

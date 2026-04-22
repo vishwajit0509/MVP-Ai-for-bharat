@@ -1,9 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Shield, LayoutDashboard, FileText, Users, ClipboardList,
-  ScrollText, Menu, X,
-  PlusCircle, UserPlus, Zap
+  ScrollText, Menu, X
 } from 'lucide-react'
 import { cn } from '../utils/cn'
 import toast from 'react-hot-toast'
@@ -16,6 +15,12 @@ const NAV_SECTIONS = [
   { id: 'review', label: 'Review Queue', icon: ScrollText, num: '04' },
   { id: 'audit', label: 'Audit Trail', icon: ScrollText, num: '05' },
 ]
+
+const ScrollContainerContext = createContext(null)
+
+export function useScrollContainer() {
+  return useContext(ScrollContainerContext)
+}
 
 export function Layout({
   tender, tenders, system, onTenderChange,
@@ -154,7 +159,7 @@ export function Layout({
       <header className="shrink-0 border-b border-slate-200/80 bg-white/85 backdrop-blur-xl relative z-30">
         {/* Subtle top line glow */}
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amber-500/20 to-transparent" />
-        
+
         <div className="flex items-center h-16 px-6 gap-4">
           {/* Brand + Mobile menu */}
           <Link to="/" className="flex items-center gap-2 font-bold text-base text-slate-800 mr-4">
@@ -164,7 +169,7 @@ export function Layout({
 
           {/* Navigation sections - horizontal */}
           <nav className="hidden lg:flex items-center gap-1 flex-1">
-            {NAV_SECTIONS.map(({ id, label, icon: Icon, num }) => {
+            {NAV_SECTIONS.map(({ id, label, icon: Icon }) => {
               const isActive = activeSection === id
               return (
                 <button
@@ -264,40 +269,65 @@ export function Layout({
 
         {/* System Status */}
         {system && (
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-lg text-xs font-mono font-semibold">
-            {system.mode === 'ai_assisted' ? (
-              <>
-                <div className="w-2 h-2 rounded-full bg-violet-500" />
-                <span className="text-violet-700">AI Assisted Mode</span>
-              </>
-            ) : (
-              <>
-                <div className="w-2 h-2 rounded-full bg-slate-400" />
-                <span className="text-slate-600">Offline Mode</span>
-              </>
-            )}
+          <div className="hidden sm:flex items-center gap-3">
+            {/* Human oversight badge - always visible */}
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200/80">
+              <svg className="w-3 h-3 text-emerald-600" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 8a3 3 0 100-6 3 3 0 000 6zm-5 6s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3z" />
+              </svg>
+              <span className="text-[11px] font-bold text-emerald-700 tracking-wide">Human Review</span>
+            </div>
+            {/* AI mode indicator */}
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono font-semibold
+                           border border-slate-200/80"
+              title={system.mode === 'ai_assisted' ? 'AI assists evaluation — all decisions require human confirmation' : 'Full offline mode — no AI calls'}
+            >
+              {system.mode === 'ai_assisted' ? (
+                <>
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-violet-500" />
+                  </span>
+                  <span className="text-violet-700">AI&#8202;+&#8202;Human</span>
+                </>
+              ) : (
+                <>
+                  <span className="w-2 h-2 rounded-full bg-slate-400" />
+                  <span className="text-slate-600">Offline</span>
+                </>
+              )}
+            </div>
           </div>
         )}
 
         {/* Action buttons */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
+          {/* New Tender — dark sparkle style */}
           <button
             id="btn-new-tender"
             onClick={handleNewTenderClick}
-            className="btn-ghost text-sm py-2"
+            className="btn-sparkle text-sm"
           >
-            <PlusCircle className="w-4 h-4" />
+            <svg className="btn-sparkle__icon" height={16} width={16} fill="currentColor" viewBox="0 0 24 24">
+              <path d="M10,21.236,6.755,14.745.264,11.5,6.755,8.255,10,1.764l3.245,6.491L19.736,11.5l-6.491,3.245ZM18,21l1.5,3L21,21l3-1.5L21,18l-1.5-3L18,18l-3,1.5ZM19.333,4.667,20.5,7l1.167-2.333L24,3.5,21.667,2.333,20.5,0,19.333,2.333,17,3.5Z" />
+            </svg>
             <span className="hidden sm:inline">New Tender</span>
           </button>
+
+          {/* Add Bidder — dark sparkle style */}
           <button
             id="btn-add-bidder"
             onClick={handleAddBidderClick}
             disabled={!tender}
-            className="btn-ghost text-sm py-2 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:transform-none"
+            className="btn-sparkle text-sm disabled:opacity-30 disabled:cursor-not-allowed"
           >
-            <UserPlus className="w-4 h-4" />
+            <svg className="btn-sparkle__icon" height={15} width={15} fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
+            </svg>
             <span className="hidden sm:inline">Add Bidder</span>
           </button>
+
+          {/* Evaluate — amber primary with sparkle */}
           <button
             id="btn-evaluate"
             onClick={handleEvaluateClick}
@@ -307,11 +337,13 @@ export function Layout({
             {evaluating ? (
               <>
                 <div className="w-4 h-4 border-2 border-slate-900/30 border-t-slate-900 rounded-full animate-spin" />
-                <span className="hidden sm:inline">Running…</span>
+                <span className="hidden sm:inline">Reviewing…</span>
               </>
             ) : (
               <>
-                <Zap className="w-4 h-4" />
+                <svg height={14} width={14} fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M10,21.236,6.755,14.745.264,11.5,6.755,8.255,10,1.764l3.245,6.491L19.736,11.5l-6.491,3.245ZM18,21l1.5,3L21,21l3-1.5L21,18l-1.5-3L18,18l-3,1.5ZM19.333,4.667,20.5,7l1.167-2.333L24,3.5,21.667,2.333,20.5,0,19.333,2.333,17,3.5Z" />
+                </svg>
                 <span className="hidden sm:inline">Evaluate</span>
               </>
             )}
@@ -322,8 +354,10 @@ export function Layout({
       {/* Main content area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Scrollable content */}
-        <main ref={mainRef} className="flex-1 overflow-y-auto scroll-smooth scroll-pt-20 scrollbar-thin noise-overlay bg-[#f7f9fc]">
-          {children}
+        <main ref={mainRef} className="scroll-container flex-1 overflow-y-auto scroll-smooth scroll-pt-20 scrollbar-thin noise-overlay bg-[#f7f9fc]">
+          <ScrollContainerContext.Provider value={mainRef}>
+            {children}
+          </ScrollContainerContext.Provider>
         </main>
       </div>
     </div>
