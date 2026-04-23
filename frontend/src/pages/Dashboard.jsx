@@ -24,26 +24,26 @@ function Section({ id, eyebrow, title, children }) {
   return (
     <section
       id={`section-${id}`}
-      className="px-7 lg:px-10 py-14 scroll-mt-20 relative"
+      className="px-7 lg:px-10 py-12 scroll-mt-20 relative"
     >
-      <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-stone-300/90 to-transparent" />
+      <div className="absolute top-0 left-8 right-8 h-px bg-slate-200/60" />
 
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-50px', root: scrollContainerRef }}
-          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.4 }}
           className="mb-8"
         >
-          <p className="section-eyebrow">{eyebrow}</p>
-          <h2 className="text-3xl font-bold text-slate-950 tracking-tight">{title}</h2>
+          <p className="section-eyebrow text-slate-500">{eyebrow}</p>
+          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">{title}</h2>
         </motion.div>
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-30px', root: scrollContainerRef }}
-          transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.4, delay: 0.1 }}
         >
           {children}
         </motion.div>
@@ -80,7 +80,6 @@ export function Dashboard() {
   }
 
   function scrollToMetrics() {
-    toast('Showing overview.', { id: 'section-navigation' })
     document.getElementById('section-metrics')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
@@ -101,21 +100,16 @@ export function Dashboard() {
 
   if (loading && !tender) {
     return (
-      <div className="flex items-center justify-center h-screen bg-[#f7f9fc]">
+      <div className="flex items-center justify-center h-screen bg-slate-50">
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
+          initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           className="text-center"
         >
-          <div className="relative mx-auto mb-6 w-16 h-16">
-            <div className="absolute inset-0 rounded-2xl bg-amber-500/20 animate-ping" />
-            <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700
-                            flex items-center justify-center">
-              <Shield className="w-8 h-8 text-slate-950" />
-            </div>
+          <div className="w-12 h-12 mx-auto rounded-xl bg-amber-100 flex items-center justify-center mb-4">
+            <Shield className="w-6 h-6 text-amber-600 animate-pulse" />
           </div>
-          <p className="text-slate-400 font-semibold">Loading workspace…</p>
-          <p className="text-slate-600 text-sm mt-1">Initializing tender intelligence engine</p>
+          <p className="text-slate-900 font-semibold text-sm">Loading workspace…</p>
         </motion.div>
       </div>
     )
@@ -135,121 +129,88 @@ export function Dashboard() {
       >
         {!tender ? (
           /* ─── Premium Empty State ─── */
-          <div className="flex flex-col items-center justify-center min-h-[80vh] text-center px-7 relative">
-            {/* Background gradient mesh */}
-            <div className="absolute inset-0 gradient-mesh" />
-
+          <div className="flex flex-col items-center justify-center min-h-[80vh] text-center px-7">
             <motion.div
-              initial={{ opacity: 0, y: 24 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="relative z-10"
+              transition={{ duration: 0.5 }}
+              className="max-w-xl"
             >
-              {/* Animated logo */}
-              <div className="relative mx-auto mb-8 w-24 h-24">
-                <div className="absolute inset-0 rounded-3xl bg-amber-500/10 animate-pulse" />
-                <div className="absolute -inset-2 rounded-[28px] bg-gradient-to-br from-amber-500/10 to-transparent blur-xl" />
-                <div className="relative w-24 h-24 rounded-3xl bg-gradient-to-br from-amber-400/20 via-amber-500/10 to-transparent
-                                border border-amber-500/20 flex items-center justify-center">
-                  <Shield className="w-12 h-12 text-amber-500/60" />
-                </div>
+              <div className="w-16 h-16 mx-auto rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center justify-center mb-6">
+                <Shield className="w-8 h-8 text-amber-500" />
               </div>
 
-              <h1 className="text-4xl lg:text-5xl font-black text-slate-950 tracking-tight mb-4">
-                CRPF Tender Intelligence
+              <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-3">
+                Procurement Intelligence
               </h1>
-              <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed mb-9">
-                Create a workspace to begin AI-powered eligibility analysis
-                and audit-first bidder evaluation.
+              <p className="text-slate-500 text-base leading-relaxed mb-8">
+                Create a workspace to extract criteria from tender documents and begin your audit-ready bidder evaluation.
               </p>
+              
               <button
                 onClick={openNewTenderForm}
-                className="btn-primary px-9 py-4 text-base font-bold"
+                className="btn-primary"
               >
-                <Sparkles className="w-5 h-5" />
+                <Sparkles className="w-4 h-4" />
                 Create First Workspace
-                <ArrowRight className="w-5 h-5" />
               </button>
-
-              {/* Feature pills */}
-              <div className="flex flex-wrap justify-center gap-3 mt-10">
-                {['AI Criteria Extraction', 'Automated Evaluation', 'Full Audit Trail', 'Export Reports'].map(f => (
-                  <div key={f} className="px-4 py-2 rounded-full bg-white/80 border border-slate-200
-                                          text-xs text-slate-600 font-medium shadow-sm">
-                    {f}
-                  </div>
-                ))}
-              </div>
             </motion.div>
           </div>
         ) : (
           <>
             {/* ─── Hero Section ─── */}
-            <div className="px-7 lg:px-10 pt-14 pb-12 relative dashboard-hero overflow-hidden">
-              <div className="max-w-7xl mx-auto relative z-10">
+            <div className="px-7 lg:px-10 pt-12 pb-10 border-b border-slate-200 bg-white">
+              <div className="max-w-7xl mx-auto">
                 <motion.div
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                  className="flex flex-col lg:flex-row lg:items-start gap-8"
+                  transition={{ duration: 0.4 }}
+                  className="flex flex-col lg:flex-row lg:items-start gap-6"
                 >
-                  {/* Tender info */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 flex-wrap mb-4">
-                      <p className="section-eyebrow">{tender.authority || 'Procurement Authority'}</p>
+                    <div className="flex items-center gap-3 mb-3">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        {tender.authority || 'Procurement Authority'}
+                      </span>
                       {system && (
                         <StatusBadge
                           status={system.mode}
-                          label={system.mode === 'ai_assisted' ? '✦ AI Assisted' : 'Offline Mode'}
+                          label={system.mode === 'ai_assisted' ? 'AI Assisted' : 'Offline Mode'}
                         />
                       )}
                     </div>
-                    <h1 className="text-3xl lg:text-4xl font-black text-slate-950 leading-snug tracking-tight mb-3">
+                    
+                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-2">
                       {tender.title}
                     </h1>
+                    
                     {tender.summary && (
-                      <p className="text-slate-600 text-base leading-relaxed max-w-3xl">{tender.summary}</p>
+                      <p className="text-slate-600 text-sm max-w-3xl line-clamp-2">{tender.summary}</p>
                     )}
 
-                    {/* Meta grid */}
-                    <div className="grid grid-cols-2 gap-x-8 gap-y-5 mt-8 max-w-3xl lg:grid-cols-5">
-                      {[
-                        { label: 'Reference', value: tender.reference_no || 'Pending', mono: true },
-                        { label: 'Status', badge: tender.status },
-                        { label: 'Open Reviews', value: tender.review_queue?.length ?? 0, color: 'text-amber-600' },
-                        { label: 'Audit Coverage', value: `${tender.metrics?.audit_coverage ?? 0}%`, color: 'text-emerald-600' },
-                        { label: 'Last Updated', value: formatDate(tender.updated_at), mono: true },
-                      ].map(item => (
-                        <div key={item.label} className="border-l border-stone-300/80 pl-4 first:border-l-0 first:pl-0">
-                          <span className="text-[10px] font-mono font-bold text-slate-600 uppercase tracking-[0.15em]">
-                            {item.label}
-                          </span>
-                          {item.badge ? (
-                            <div className="mt-1"><StatusBadge status={item.badge} /></div>
-                          ) : (
-                            <div className={`text-base font-bold mt-1 tabular-nums
-                                            ${item.mono ? 'font-mono text-sm text-slate-600' : ''}
-                                            ${item.color || 'text-slate-950'}`}>
-                              {item.value}
-                            </div>
-                          )}
-                        </div>
-                      ))}
+                    <div className="flex items-center gap-6 mt-6">
+                      <div className="flex flex-col">
+                        <span className="text-xs text-slate-500 mb-1">Status</span>
+                        <StatusBadge status={tender.status} />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-xs text-slate-500 mb-1">Reference No.</span>
+                        <span className="text-sm font-mono font-medium text-slate-900">{tender.reference_no || 'Pending'}</span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-xs text-slate-500 mb-1">Reviews Pending</span>
+                        <span className="text-sm font-medium text-amber-600">{tender.review_queue?.length ?? 0}</span>
+                      </div>
                     </div>
 
-                    <motion.button
+                    <button
                       type="button"
                       onClick={scrollToMetrics}
-                      initial={{ opacity: 0, y: 12 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.45, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                      className="mt-8 inline-flex items-center gap-2.5 rounded-full border border-amber-300/80 bg-white/88 px-5 py-2.5
-                                 text-sm font-bold text-amber-800 shadow-[0_14px_35px_rgba(120,53,15,0.08)] transition-all
-                                 hover:-translate-y-0.5 hover:border-amber-400 hover:bg-amber-50/90"
+                      className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-amber-600 hover:text-amber-700 transition-colors"
                     >
-                      View workspace
-                      <ArrowRight className="w-4 h-4 rotate-90" />
-                    </motion.button>
+                      Scroll to metrics
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
                   </div>
 
                   {/* Export actions */}
@@ -257,12 +218,10 @@ export function Dashboard() {
                     {[
                       { href: api.getReportPageUrl(tender.id), icon: Printer, label: 'Print Report', target: '_blank' },
                       { href: api.getReportCsvUrl(tender.id), icon: Download, label: 'Export CSV' },
-                      { href: api.getReportJsonUrl(tender.id), icon: FileJson, label: 'Open JSON', target: '_blank' },
                     ].map(({ href, icon: Icon, label, target }) => (
                       <a key={label} href={href} target={target} rel="noreferrer"
-                         onClick={() => toast(`Opening ${label}.`, { id: `open-${label}` })}
-                         className="btn-ghost text-sm py-2.5">
-                        <Icon className="w-4 h-4" /> {label}
+                         className="btn-ghost">
+                        <Icon className="w-4 h-4 text-slate-400" /> {label}
                       </a>
                     ))}
                   </div>
@@ -278,31 +237,30 @@ export function Dashboard() {
             </section>
 
             {/* ─── Criteria ─── */}
-            <Section id="criteria" eyebrow="01 · Tender Understanding" title="Eligibility Criteria">
+            <Section id="criteria" eyebrow="Step 1" title="Eligibility Criteria">
               <CriteriaGrid criteria={tender.criteria} onEditCriterion={openCriterionEditor} />
             </Section>
 
             {/* ─── Matrix ─── */}
-            <Section id="matrix" eyebrow="02 · Criterion-Level Verdicts" title="Evaluation Matrix">
+            <Section id="matrix" eyebrow="Step 2" title="Evaluation Matrix">
               <EvaluationMatrix criteria={tender.criteria} bidders={tender.bidders} />
             </Section>
 
             {/* ─── Bidders ─── */}
-            <Section id="bidders" eyebrow="03 · Evidence Pack" title="Bidder Dossiers">
+            <Section id="bidders" eyebrow="Step 3" title="Bidder Dossiers">
               <BidderDossiers bidders={tender.bidders} />
             </Section>
 
             {/* ─── Review Queue ─── */}
-            <Section id="review" eyebrow="04 · Human-in-the-Loop" title="Manual Review Queue">
+            <Section id="review" eyebrow="Step 4" title="Manual Review Queue">
               <ReviewQueue reviewQueue={tender.review_queue} onResolved={r => updateSelectedTender(r)} />
             </Section>
 
             {/* ─── Audit Trail ─── */}
-            <Section id="audit" eyebrow="05 · Auditability" title="Decision Trail">
+            <Section id="audit" eyebrow="Log" title="Decision Trail">
               <AuditTrail auditEvents={tender.audit_events} />
             </Section>
 
-            {/* Footer padding */}
             <div className="h-16" />
           </>
         )}

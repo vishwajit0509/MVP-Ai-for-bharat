@@ -189,26 +189,26 @@
 
   /* ── Premium Buttons ── */
   .btn-primary {
-    @apply inline-flex items-center gap-2.5 px-6 py-3 rounded-xl font-semibold text-base text-slate-950 transition-all duration-300;
-    background: linear-gradient(135deg, #fcd34d, #f59e0b, #c2410c);
-    background-size: 200% 200%;
-    animation: gradient-shift 3s ease infinite;
-    box-shadow:
-      0 12px 32px rgba(180, 83, 9, 0.18),
-      0 4px 14px rgba(120, 53, 15, 0.12),
-      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    @apply inline-flex items-center gap-2.5 px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-200;
+    background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
+    color: #ffffff;
+    box-shadow: 
+      0 1px 2px rgba(0, 0, 0, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    border: 1px solid #b45309;
   }
 
-  .btn-primary:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow:
-      0 0 30px rgba(245, 158, 11, 0.4),
-      0 12px 28px rgba(217, 119, 6, 0.24),
-      inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  btn-primary:hover:not(:disabled) {
+    background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 100%);
+    transform: translateY(-1px);
+    box-shadow: 
+      0 4px 12px rgba(217, 119, 6, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
   }
 
   .btn-primary:active:not(:disabled) {
     transform: translateY(0);
+    box-shadow: none;
   }
 
   .btn-primary:disabled {
@@ -229,18 +229,19 @@
   }
 
   /* ── Ghost Button ── */
+  /* ── Ghost Button (Cleaned up) ── */
   .btn-ghost {
-    @apply inline-flex items-center gap-2.5 px-5 py-2.5 rounded-xl font-semibold text-base text-slate-700 transition-all duration-200;
-    border: 1px solid rgba(120, 113, 108, 0.16);
-    background: rgba(255, 252, 247, 0.78);
+    @apply inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl font-semibold text-sm text-slate-600 transition-all duration-200;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
   }
 
   .btn-ghost:hover {
-    @apply text-slate-950;
-    border-color: rgba(217, 119, 6, 0.28);
-    background: rgba(255, 251, 235, 0.92);
-    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.07);
-    transform: translateY(-1px);
+    @apply text-slate-900;
+    border-color: #cbd5e1;
+    background: #f8fafc;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
   }
 
   /* ── Sparkle Button (dark, purple hover glow) ── */
